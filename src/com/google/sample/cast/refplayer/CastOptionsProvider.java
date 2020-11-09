@@ -16,11 +16,13 @@
 
 package com.google.sample.cast.refplayer;
 
+import com.google.android.gms.cast.LaunchOptions;
 import com.google.android.gms.cast.MediaMetadata;
 import com.google.android.gms.cast.framework.CastOptions;
 import com.google.android.gms.cast.framework.OptionsProvider;
 import com.google.android.gms.cast.framework.SessionProvider;
 import com.google.android.gms.cast.framework.media.CastMediaOptions;
+import com.google.android.gms.cast.framework.media.ImageHints;
 import com.google.android.gms.cast.framework.media.ImagePicker;
 import com.google.android.gms.cast.framework.media.MediaIntentReceiver;
 import com.google.android.gms.cast.framework.media.NotificationOptions;
@@ -50,7 +52,12 @@ public class CastOptionsProvider implements OptionsProvider {
                 .setNotificationOptions(notificationOptions)
                 .setExpandedControllerActivityClassName(ExpandedControlsActivity.class.getName())
                 .build();
+        /** Following lines enable Cast Connect */
+        LaunchOptions launchOptions = new LaunchOptions.Builder()
+                .setAndroidReceiverCompatible(true)
+                .build();
         return new CastOptions.Builder()
+                .setLaunchOptions(launchOptions)
                 .setReceiverApplicationId(context.getString(R.string.app_id))
                 .setCastMediaOptions(mediaOptions)
                 .build();
@@ -64,7 +71,8 @@ public class CastOptionsProvider implements OptionsProvider {
     private static class ImagePickerImpl extends ImagePicker {
 
         @Override
-        public WebImage onPickImage(MediaMetadata mediaMetadata, int type) {
+        public WebImage onPickImage(MediaMetadata mediaMetadata, ImageHints hints) {
+            int type = hints.getType();
             if ((mediaMetadata == null) || !mediaMetadata.hasImages()) {
                 return null;
             }
